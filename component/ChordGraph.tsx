@@ -1,5 +1,7 @@
 // components/ChordGraph.tsx
+
 'use client'
+
 
 
 
@@ -11,9 +13,11 @@ interface ChordGraphProps {
 }
 
 const ChordGraph: React.FC<ChordGraphProps> = ({ data }) => {
-  const ref = useRef<SVGSVGElement | null>(null);
+  const svgRef = useRef<SVGSVGElement | null>(null);
 
   useEffect(() => {
+    if (!svgRef.current) return;
+
     const width = 800;
     const height = 800;
     const innerRadius = Math.min(width, height) * 0.5 - 90;
@@ -21,18 +25,18 @@ const ChordGraph: React.FC<ChordGraphProps> = ({ data }) => {
 
     const chord = d3.chord<number>()
       .padAngle(0.05)
-      .sortSubgroups(d3.descending)(data);
+      .sortSubgroups((a, b) => b.value - a.value)(data);
 
-    const arc = d3.arc<d3.ChordGroup>()
+    const arc = d3.arc<d3.DefaultArcObject>()
       .innerRadius(innerRadius)
       .outerRadius(outerRadius);
 
-    const ribbon = d3.ribbon<d3.Chord, d3.ChordSubgroup>()
+    const ribbon = d3.ribbon()
       .radius(innerRadius);
 
     const color = d3.scaleOrdinal<number, string>(d3.schemeCategory10);
 
-    const svg = d3.select(ref.current)
+    const svg = d3.select(svgRef.current)
       .attr('viewBox', [-width / 2, -height / 2, width, height].join(' '))
       .attr('style', 'width: 100%; height: auto; font: 10px sans-serif;');
 
@@ -47,14 +51,14 @@ const ChordGraph: React.FC<ChordGraphProps> = ({ data }) => {
       .attr('d', arc);
 
     group.append('text')
-      .each(d => { d.angle = (d.startAngle + d.endAngle) / 2; })
+      .each(d => { (d as any).angle = (d.startAngle + d.endAngle) / 2; })
       .attr('dy', '.35em')
       .attr('transform', d => `
-        rotate(${(d.angle * 180 / Math.PI - 90)})
+        rotate(${((d as any).angle * 180 / Math.PI - 90)})
         translate(${outerRadius + 5})
-        ${d.angle > Math.PI ? 'rotate(180)' : ''}
+        ${(d as any).angle > Math.PI ? 'rotate(180)' : ''}
       `)
-      .attr('text-anchor', d => d.angle > Math.PI ? 'end' : null)
+      .attr('text-anchor', d => (d as any).angle > Math.PI ? 'end' : null)
       .text(d => `Group ${d.index + 1}`);
 
     svg.append('g')
@@ -69,7 +73,7 @@ const ChordGraph: React.FC<ChordGraphProps> = ({ data }) => {
   }, [data]);
 
   return (
-    <svg ref={ref}></svg>
+    <svg ref={svgRef}></svg>
   );
 };
 
