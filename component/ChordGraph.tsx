@@ -1,3 +1,4 @@
+// components/ChordGraph.tsx
 'use client';
 
 import React, { useEffect, useRef } from 'react';
@@ -5,8 +6,6 @@ import * as d3 from 'd3';
 
 interface ChordGraphProps {
   data: number[][];
-  
-
 }
 
 const ChordGraph: React.FC<ChordGraphProps> = ({ data }) => {
@@ -23,15 +22,14 @@ const ChordGraph: React.FC<ChordGraphProps> = ({ data }) => {
     const chord = d3
       .chord()
       .padAngle(0.05)
-      .sortSubgroups((a, b) => b.value - a.value)
-      .size([360, outerRadius])(data);
+      .sortSubgroups(d3.descending)(data);
 
     const arc = d3
-      .arc<d3.DefaultArcObject>()
+      .arc<d3.ChordGroup>()
       .innerRadius(innerRadius)
       .outerRadius(outerRadius);
 
-    const ribbon = d3.ribbon().radius(innerRadius);
+    const ribbon = d3.ribbon<d3.Chord, d3.ChordSubgroup>().radius(innerRadius);
 
     const color = d3.scaleOrdinal<number, string>(d3.schemeCategory10);
 
@@ -50,7 +48,7 @@ const ChordGraph: React.FC<ChordGraphProps> = ({ data }) => {
     group
       .append('path')
       .attr('fill', (d) => color(d.index))
-      .attr('stroke', (d) => d3.rgb(color(d.index)).darker())
+      .attr('stroke', (d) => d3.rgb(color(d.index)).darker().toString()) // Convert RGBColor to string
       .attr('d', arc);
 
     group
@@ -79,7 +77,7 @@ const ChordGraph: React.FC<ChordGraphProps> = ({ data }) => {
       .append('path')
       .attr('d', ribbon)
       .attr('fill', (d) => color(d.target.index))
-      .attr('stroke', (d) => d3.rgb(color(d.target.index)).darker());
+      .attr('stroke', (d) => d3.rgb(color(d.target.index)).darker().toString()); // Convert RGBColor to string
   }, [data]);
 
   return <svg ref={svgRef}></svg>;
