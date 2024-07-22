@@ -5,6 +5,8 @@ import * as d3 from 'd3';
 
 interface ChordGraphProps {
   data: number[][];
+  
+
 }
 
 const ChordGraph: React.FC<ChordGraphProps> = ({ data }) => {
