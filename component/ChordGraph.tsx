@@ -55,7 +55,7 @@ const ChordGraph: React.FC<ChordGraphProps> = ({ data }) => {
       .attr('d', arc)
       .attr('opacity', 0) // Start with opacity 0 for fade-in effect
       .transition()
-      .duration(1000) // Duration of the animation
+      .duration(2000) // Duration of the animation
       .attr('opacity', 1) // Fade-in to full opacity
       .attr('d', arc);
 
@@ -90,7 +90,7 @@ const ChordGraph: React.FC<ChordGraphProps> = ({ data }) => {
       .attr('stroke', (d) => d3.rgb(color(d.target.index)).darker())
       .attr('opacity', 0) // Start with opacity 0 for fade-in effect
       .transition()
-      .duration(1000) // Duration of the animation
+      .duration(2000) // Duration of the animation
       .attr('opacity', 1) // Fade-in to full opacity
       .attr('d', ribbon);
 

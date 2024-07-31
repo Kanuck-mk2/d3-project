@@ -19,6 +19,6 @@
   }
   
   path:hover {
-    fill: #ff0; /* Example hover effect */
+    fill:  hsl(270, 50%, 60%); /* Example hover effect */
     stroke-width: 2px;
   }
