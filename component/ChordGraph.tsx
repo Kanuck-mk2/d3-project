@@ -31,12 +31,37 @@ const ChordGraph: React.FC<ChordGraphProps> = ({ data }) => {
 
     const ribbon = d3.ribbon().radius(innerRadius);
 
-    const color = d3.scaleOrdinal<number, string>(d3.schemeCategory10);
+    const color = d3.scaleOrdinal<number, string>(d3.schemeCategory10); // Define color scale
 
     const svg = d3
       .select(svgRef.current)
       .attr('viewBox', [-width / 2, -height / 2, width, height].join(' '))
       .attr('style', 'width: 100%; height: auto; font: 10px sans-serif;');
+
+    // Define linear gradients
+    const defs = svg.append('defs');
+
+    defs
+      .append('linearGradient')
+      .attr('id', 'gradient1')
+      .attr('x1', '0%')
+      .attr('x2', '100%')
+      .attr('y1', '0%')
+      .attr('y2', '100%')
+      .append('stop')
+      .attr('offset', '0%')
+      .attr('stop-color', '#1f77b4'); // Start color
+
+    defs
+      .append('linearGradient')
+      .attr('id', 'gradient2')
+      .attr('x1', '0%')
+      .attr('x2', '100%')
+      .attr('y1', '0%')
+      .attr('y2', '100%')
+      .append('stop')
+      .attr('offset', '100%')
+      .attr('stop-color', '#ff7f0e'); // End color
 
     // Update arcs
     const groups = svg
@@ -46,7 +71,7 @@ const ChordGraph: React.FC<ChordGraphProps> = ({ data }) => {
 
     groups
       .append('path')
-      .attr('fill', (d) => color(d.index))
+      .attr('fill', (d, i) => i % 2 === 0 ? 'url(#gradient1)' : 'url(#gradient2)') // Apply gradients
       .attr('stroke', (d) => d3.rgb(color(d.index)).darker())
       .attr('d', arc)
       .attr('opacity', 0)
@@ -62,7 +87,7 @@ const ChordGraph: React.FC<ChordGraphProps> = ({ data }) => {
       .join('path')
       .attr('class', 'ribbon')
       .attr('d', ribbon)
-      .attr('fill', (d) => color(d.target.index))
+      .attr('fill', (d) => d3.rgb(color(d.target.index)).brighter(0.5).toString()) // Apply color gradient
       .attr('stroke', (d) => d3.rgb(color(d.target.index)).darker())
       .attr('opacity', 0)
       .transition()
