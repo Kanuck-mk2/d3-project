@@ -13,3 +13,12 @@
     pointer-events: none;
     visibility: hidden; 
   }
+
+  path {
+    transition: all 0.5s ease;
+  }
+  
+  path:hover {
+    fill: #ff0; /* Example hover effect */
+    stroke-width: 2px;
+  }
