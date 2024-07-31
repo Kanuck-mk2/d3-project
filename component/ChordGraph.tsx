@@ -9,9 +9,10 @@ interface ChordGraphProps {
 
 const ChordGraph: React.FC<ChordGraphProps> = ({ data }) => {
   const svgRef = useRef<SVGSVGElement | null>(null);
+  const tooltipRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
-    if (!svgRef.current) return;
+    if (!svgRef.current || !tooltipRef.current) return;
 
     const width = 800;
     const height = 800;
@@ -21,15 +22,14 @@ const ChordGraph: React.FC<ChordGraphProps> = ({ data }) => {
     const chord = d3
       .chord()
       .padAngle(0.05)
-      .sortSubgroups(d3.descending)(data);
+      .sortSubgroups((a, b) => b.value - a.value)(data);
 
     const arc = d3
-      .arc<d3.ChordGroup>()
+      .arc<d3.DefaultArcObject>()
       .innerRadius(innerRadius)
       .outerRadius(outerRadius);
 
-    const ribbon = d3.ribbon<d3.Chord, d3.ChordSubgroup>()
-      .radius(innerRadius);
+    const ribbon = d3.ribbon().radius(innerRadius);
 
     const color = d3.scaleOrdinal<number, string>(d3.schemeCategory10);
 
@@ -48,25 +48,21 @@ const ChordGraph: React.FC<ChordGraphProps> = ({ data }) => {
     group
       .append('path')
       .attr('fill', (d) => color(d.index))
-      .attr('stroke', (d) => d3.rgb(color(d.index)).darker().toString())
-      .attr('d', arc);
-
-    group
-      .append('text')
-      .each((d) => {
-        (d as any).angle = (d.startAngle + d.endAngle) / 2;
+      .attr('stroke', (d) => d3.rgb(color(d.index)).darker())
+      .attr('d', arc)
+      .on('mouseover', function (event, d) {
+        d3.select(this).attr('stroke-width', 2);
+        tooltipRef.current!.style.visibility = 'visible';
+        tooltipRef.current!.textContent = `Group ${d.index + 1}: ${d.value}`;
       })
-      .attr('dy', '.35em')
-      .attr(
-        'transform',
-        (d) => `
-        rotate(${((d as any).angle * 180) / Math.PI - 90})
-        translate(${outerRadius + 5})
-        ${(d as any).angle > Math.PI ? 'rotate(180)' : ''}
-      `,
-      )
-      .attr('text-anchor', (d) => ((d as any).angle > Math.PI ? 'end' : null))
-      .text((d) => `Group ${d.index + 1}`);
+      .on('mousemove', function (event) {
+        tooltipRef.current!.style.top = `${event.clientY + 10}px`;
+        tooltipRef.current!.style.left = `${event.clientX + 10}px`;
+      })
+      .on('mouseout', function () {
+        d3.select(this).attr('stroke-width', null);
+        tooltipRef.current!.style.visibility = 'hidden';
+      });
 
     svg
       .append('g')
@@ -77,10 +73,15 @@ const ChordGraph: React.FC<ChordGraphProps> = ({ data }) => {
       .append('path')
       .attr('d', ribbon)
       .attr('fill', (d) => color(d.target.index))
-      .attr('stroke', (d) => d3.rgb(color(d.target.index)).darker().toString());
+      .attr('stroke', (d) => d3.rgb(color(d.target.index)).darker());
   }, [data]);
 
-  return <svg ref={svgRef}></svg>;
+  return (
+    <div>
+      <svg ref={svgRef}></svg>
+      <div className="tooltip" ref={tooltipRef}></div>
+    </div>
+  );
 };
 
 export default ChordGraph;
