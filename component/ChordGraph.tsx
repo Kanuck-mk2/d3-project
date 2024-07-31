@@ -1,4 +1,3 @@
-// components/ChordGraph.tsx
 'use client';
 
 import React, { useEffect, useRef } from 'react';
@@ -29,7 +28,8 @@ const ChordGraph: React.FC<ChordGraphProps> = ({ data }) => {
       .innerRadius(innerRadius)
       .outerRadius(outerRadius);
 
-    const ribbon = d3.ribbon<d3.Chord, d3.ChordSubgroup>().radius(innerRadius);
+    const ribbon = d3.ribbon<d3.Chord, d3.ChordSubgroup>()
+      .radius(innerRadius);
 
     const color = d3.scaleOrdinal<number, string>(d3.schemeCategory10);
 
@@ -48,7 +48,7 @@ const ChordGraph: React.FC<ChordGraphProps> = ({ data }) => {
     group
       .append('path')
       .attr('fill', (d) => color(d.index))
-      .attr('stroke', (d) => d3.rgb(color(d.index)).darker().toString()) // Convert RGBColor to string
+      .attr('stroke', (d) => d3.rgb(color(d.index)).darker().toString())
       .attr('d', arc);
 
     group
@@ -77,7 +77,7 @@ const ChordGraph: React.FC<ChordGraphProps> = ({ data }) => {
       .append('path')
       .attr('d', ribbon)
       .attr('fill', (d) => color(d.target.index))
-      .attr('stroke', (d) => d3.rgb(color(d.target.index)).darker().toString()); // Convert RGBColor to string
+      .attr('stroke', (d) => d3.rgb(color(d.target.index)).darker().toString());
   }, [data]);
 
   return <svg ref={svgRef}></svg>;
