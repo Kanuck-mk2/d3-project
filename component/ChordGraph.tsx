@@ -1,6 +1,4 @@
-// ChordGraph.tsx
-
-'use client' 
+'use client';
 
 import React, { useEffect, useRef } from 'react';
 import * as d3 from 'd3';
@@ -24,7 +22,7 @@ const ChordGraph: React.FC<ChordGraphProps> = ({ data }) => {
     const chord = d3
       .chord()
       .padAngle(0.05)
-      .sortSubgroups((a, b) => b.value - a.value)(data);
+      .sortSubgroups(d3.descending)(data);
 
     const arc = d3
       .arc<d3.DefaultArcObject>()
@@ -40,27 +38,40 @@ const ChordGraph: React.FC<ChordGraphProps> = ({ data }) => {
       .attr('viewBox', [-width / 2, -height / 2, width, height].join(' '))
       .attr('style', 'width: 100%; height: auto; font: 10px sans-serif;');
 
-    const group = svg
-      .append('g')
+    // Update arcs
+    const groups = svg
       .selectAll('g')
       .data(chord.groups)
-      .enter()
-      .append('g');
+      .join('g');
 
-    // Append and animate arcs
-    group
+    groups
       .append('path')
       .attr('fill', (d) => color(d.index))
       .attr('stroke', (d) => d3.rgb(color(d.index)).darker())
       .attr('d', arc)
-      .attr('opacity', 0) // Start with opacity 0 for fade-in effect
+      .attr('opacity', 0)
       .transition()
-      .duration(2000) // Duration of the animation
-      .attr('opacity', 1) // Fade-in to full opacity
+      .duration(1000)
+      .attr('opacity', 1)
       .attr('d', arc);
 
-    // Add text labels with animation
-    group
+    // Update ribbons
+    svg
+      .selectAll('path.ribbon')
+      .data(chord)
+      .join('path')
+      .attr('class', 'ribbon')
+      .attr('d', ribbon)
+      .attr('fill', (d) => color(d.target.index))
+      .attr('stroke', (d) => d3.rgb(color(d.target.index)).darker())
+      .attr('opacity', 0)
+      .transition()
+      .duration(1000)
+      .attr('opacity', 1)
+      .attr('d', ribbon);
+
+    // Add text labels
+    groups
       .append('text')
       .each((d) => {
         (d as any).angle = (d.startAngle + d.endAngle) / 2;
@@ -74,29 +85,15 @@ const ChordGraph: React.FC<ChordGraphProps> = ({ data }) => {
         ${(d as any).angle > Math.PI ? 'rotate(180)' : ''}
       `,
       )
-      .attr('text-anchor', (d) => ((d as any).angle > Math.PI ? 'end' : null))
-      .text((d) => `Group ${d.index + 1}`);
-
-    // Append and animate ribbons
-    svg
-      .append('g')
-      .attr('fill-opacity', 0.67)
-      .selectAll('path')
-      .data(chord)
-      .enter()
-      .append('path')
-      .attr('d', ribbon)
-      .attr('fill', (d) => color(d.target.index))
-      .attr('stroke', (d) => d3.rgb(color(d.target.index)).darker())
-      .attr('opacity', 0) // Start with opacity 0 for fade-in effect
+      .attr('text-anchor', (d) => ((d as any).angle > Math.PI ? 'end' : 'start'))
+      .text((d) => `Group ${d.index + 1}`)
+      .attr('opacity', 0)
       .transition()
-      .duration(2000) // Duration of the animation
-      .attr('opacity', 1) // Fade-in to full opacity
-      .attr('d', ribbon);
+      .duration(1000)
+      .attr('opacity', 1);
 
     // Tooltip handling
-    group
-      .selectAll('path')
+    svg.selectAll('path')
       .on('mouseover', function (event, d) {
         d3.select(this).attr('stroke-width', 2);
         tooltipRef.current!.style.visibility = 'visible';
