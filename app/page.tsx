@@ -29,9 +29,9 @@ const Home: React.FC = () => {
 
   return (
     <div className="bg-black flex flex-col items-center justify-center text-center min-h-screen py-2">
-      <h1 className="text-4xl text-center font-bold mb-8 text-sky-400">D3 Chord Graph</h1>
+      <h1 className="text-4xl  font-bold mb-8 text-sky-400 flex justify-center items-center h-full w-full">D3 Chord Graph</h1>
       <ChordGraph data={data} />
-      <button onClick={toggleData} className="mt-4 p-2 bg-blue-500 text-white rounded">
+      <button onClick={toggleData} className="mt-4 p-2 bg-white-500 text-black rounded">
         {isDefault ? 'Switch to Updated Data' : 'Switch to Default Data'}
       </button>
     </div>

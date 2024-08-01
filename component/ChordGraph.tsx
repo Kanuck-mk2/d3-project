@@ -72,7 +72,7 @@ const ChordGraph: React.FC<ChordGraphProps> = ({ data }) => {
     groups
       .append('path')
       .attr('fill', (d, i) => i % 2 === 0 ? 'url(#gradient1)' : 'url(#gradient2)') // Apply gradients
-      .attr('stroke', (d) => d3.rgb(color(d.index)).darker())
+      .attr('stroke', (d) => d3.rgb(color(d.index)).darker().toString())
       .attr('d', arc)
       .attr('opacity', 0)
       .transition()
