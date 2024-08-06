@@ -48,7 +48,7 @@ const ChordGraph: React.FC<ChordGraphProps> = ({ data }) => {
     const svg = d3
       .select(svgRef.current)
       .attr('viewBox', [-width / 2, -height / 2, width, height].join(' '))
-      .attr('style', 'width: 100%; height: auto; font: 10px sans-serif;');
+      .attr('style', 'width: 100%; height: auto; font: 15px sans-serif;');
 
     // Define linear gradients
     const defs = svg.append('defs');
