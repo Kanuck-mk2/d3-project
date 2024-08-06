@@ -5,6 +5,7 @@ import * as d3 from 'd3';
 
 interface ChordGraphProps {
   data: number[][];
+ 
 }
 
 const ChordGraph: React.FC<ChordGraphProps> = ({ data }) => {
@@ -31,7 +32,18 @@ const ChordGraph: React.FC<ChordGraphProps> = ({ data }) => {
 
     const ribbon = d3.ribbon().radius(innerRadius);
 
-    const color = d3.scaleOrdinal<number, string>(d3.schemeCategory10); // Define color scale
+    const color = d3.scaleOrdinal<number, string>([
+      '#ff0000', 
+      '#00ff00', 
+      '#0000ff', 
+      '#ffff00', 
+      '#ff00ff', 
+      '#00ffff', 
+      '#ffa500', 
+      '#800080', 
+      '#8b0000', 
+      '#008b8b',  
+    ]); 
 
     const svg = d3
       .select(svgRef.current)
@@ -88,7 +100,7 @@ const ChordGraph: React.FC<ChordGraphProps> = ({ data }) => {
       .attr('class', 'ribbon')
       .attr('d', ribbon)
       .attr('fill', (d) => d3.rgb(color(d.target.index)).brighter(0.5).toString()) // Apply color gradient
-      .attr('stroke', (d) => d3.rgb(color(d.target.index)).darker())
+      .attr('stroke', (d) => d3.rgb(color(d.target.index)).darker().toString())
       .attr('opacity', 0)
       .transition()
       .duration(1000)
