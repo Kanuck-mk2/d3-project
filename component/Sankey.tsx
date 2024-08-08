@@ -1,7 +1,3 @@
-
-'use client'
-
-
 import React, { useEffect, useRef } from 'react';
 import * as d3 from 'd3';
 import { sankey as d3Sankey, sankeyLinkHorizontal, SankeyLink, SankeyNode } from 'd3-sankey';
@@ -43,31 +39,6 @@ const SankeyDiagram: React.FC<{ data: SankeyData }> = ({ data }) => {
     const { nodes, links } = sankey(data);
 
     svg.selectAll('*').remove();
-
-    // Define linear gradients
-    const defs = svg.append('defs');
-
-    defs
-      .append('linearGradient')
-      .attr('id', 'gradient1')
-      .attr('x1', '0%')
-      .attr('x2', '100%')
-      .attr('y1', '0%')
-      .attr('y2', '100%')
-      .append('stop')
-      .attr('offset', '0%')
-      .attr('stop-color', '#1f77b4'); // Start color
-
-    defs
-      .append('linearGradient')
-      .attr('id', 'gradient2')
-      .attr('x1', '0%')
-      .attr('x2', '100%')
-      .attr('y1', '0%')
-      .attr('y2', '100%')
-      .append('stop')
-      .attr('offset', '100%')
-      .attr('stop-color', '#ff7f0e'); // End color
 
     // Add the links
     svg.append('g')
