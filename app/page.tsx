@@ -1,4 +1,5 @@
-import React from 'react';
+'use client'
+
 import ChordGraph from '../component/ChordGraph' // Make sure to adjust the path accordingly
 import SankeyDiagram from '../component/Sankey'; // Make sure to adjust the path accordingly
 

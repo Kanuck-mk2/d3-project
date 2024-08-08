@@ -2,11 +2,11 @@ import React, { useEffect, useRef } from 'react';
 import * as d3 from 'd3';
 import { sankey as d3Sankey, sankeyLinkHorizontal, SankeyLink, SankeyNode } from 'd3-sankey';
 
-interface Node extends SankeyNode {
+interface Node extends SankeyNode<{}, {}> {
   name: string;
 }
 
-interface Link extends SankeyLink<Node, Node> {
+interface Link extends SankeyLink<Node, {}> {
   source: number;
   target: number;
   value: number;
