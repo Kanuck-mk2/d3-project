@@ -16,13 +16,27 @@ const App: React.FC = () => {
       { name: "B" },
       { name: "C" },
       { name: "D" },
-      { name: "E" }
+      { name: "E" },
+      { name: "F" },
+      { name: "G" },
+      { name: "H" },
+      { name: "I" },
+      { name: "J" },
+      { name: "K" },
+      { name: "L" }
     ],
     links: [
-      { source: 0, target: 1, value: 10 },
+      { source: 0, target: 12, value: 10 },
       { source: 1, target: 2, value: 5 },
-      { source: 1, target: 3, value: 15 },
+      { source: 4, target: 3, value: 15 },
       { source: 2, target: 4, value: 5 },
+      { source: 1, target: 3, value: 15 },
+      { source: 1, target: 11, value: 6 },
+      { source: 5, target: 5, value: 15 },
+      { source: 1, target: 3, value: 10 },
+      { source: 8, target: 7, value: 4 },
+      { source: 1, target: 4, value: 15 },
+      { source: 1, target: 9, value: 15 },
       { source: 3, target: 4, value: 10 }
     ]
   };
