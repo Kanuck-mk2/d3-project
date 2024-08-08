@@ -42,7 +42,7 @@ const App: React.FC = () => {
   };
 
   return (
-    <div className="container mx-auto p-4">
+    <div className="flex justify-center items-center container mx-auto p-4">
       <h1 className="text-center text-2xl font-bold mb-8">Data Visualizations</h1>
       <div className="mb-12">
         <h2 className="text-center text-xl font-semibold mb-4">Chord Graph</h2>
