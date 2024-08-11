@@ -80,16 +80,18 @@ export default function Home() {
         Data Visualizations
       </h1>
       <div className=" justify-center items-center mb-12 min-w-max min-h-max">
-        <h2 className="text-center text-xl text-white font-semibold mb-4">Chord Graph</h2>
+        <h2 className="text-center text-xl text-white font-semibold mb-4">
+          Chord Graph
+        </h2>
         <ChordGraph data={chordData} />
-        <div className='flex justify-center items-center'>
-        <button
-          type="button"
-          className="mt-4 p-4 bg-blue-500 text-white rounded hover:bg-blue-700"
-          onClick={changeData}
-        >
-          Change Data
-        </button>
+        <div className="flex justify-center items-center">
+          <button
+            type="button"
+            className="mt-4 p-4 bg-blue-500 text-black rounded hover:bg-sky-400"
+            onClick={changeData}
+          >
+            Change Data
+          </button>
         </div>
       </div>
       <div>
