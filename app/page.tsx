@@ -32,9 +32,9 @@ export default function Home() {
   // Second dataset for the Chord graph
   const secondChordData: ChordData = [
     [5000, 2000, 3000, 4000],
-    [1000, 7000, 2000, 3000],
-    [3000, 4000, 7000, 5000],
-    [2000, 3000, 5000, 1000],
+    [6000, 7000, 2030, 3000],
+    [3000, 4700, 7000, 5000],
+    [2000, 3040, 5000, 1000],
   ];
 
   // Function to change the dataset for the Chord graph
