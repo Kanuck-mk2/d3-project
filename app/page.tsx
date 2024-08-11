@@ -1,8 +1,8 @@
-import React from 'react';
+'use client';
+import React, { useState } from 'react';
 import ChordGraph from '../component/ChordGraph';
 import SankeyDiagram from '../component/Sankey';
 
-// Define types for your data
 type ChordData = number[][];
 
 interface SankeyNode {
@@ -21,53 +21,81 @@ interface SankeyData {
 }
 
 export default function Home() {
-  const chordData: ChordData = [
+  // Initialize state with the first dataset for the Chord graph
+  const [chordData, setChordData] = useState<ChordData>([
     [11975, 5871, 8916, 2868],
     [1951, 10048, 2060, 6171],
     [8010, 16145, 8090, 8045],
     [1013, 990, 940, 6907],
+  ]);
+
+  // Second dataset for the Chord graph
+  const secondChordData: ChordData = [
+    [5000, 2000, 3000, 4000],
+    [1000, 7000, 2000, 3000],
+    [3000, 4000, 7000, 5000],
+    [2000, 3000, 5000, 1000],
   ];
 
+  // Function to change the dataset for the Chord graph
+  const changeData = () => {
+    setChordData(secondChordData);
+  };
+
+  // Sankey data definition
   const sankeyData: SankeyData = {
     nodes: [
-      { name: "A" },
-      { name: "B" },
-      { name: "C" },
-      { name: "D" },
-      { name: "E" },
-      { name: "F" },
-      { name: "G" },
-      { name: "H" },
-      { name: "I" },
-      { name: "J" },
-      { name: "K" },
-      { name: "L" }
+      { name: 'A' },
+      { name: 'B' },
+      { name: 'C' },
+      { name: 'D' },
+      { name: 'E' },
+      { name: 'F' },
+      { name: 'G' },
+      { name: 'H' },
+      { name: 'I' },
+      { name: 'J' },
+      { name: 'K' },
+      { name: 'L' },
     ],
     links: [
-      { source: "B", target: "K", value: 10 },
-      { source: "B", target: "K", value: 5 },
-      { source: "B", target: "F", value: 15 },
-      { source: "C", target: "E", value: 5 },
-      { source: "B", target: "H", value: 15 },
-      { source: "B", target: "L", value: 6 },
-      { source: "B", target: "K", value: 15 },
-      { source: "B", target: "I", value: 10 },
-      { source: "C", target: "H", value: 4 },
-      { source: "B", target: "G", value: 15 },
-      { source: "B", target: "J", value: 15 },
-      { source: "D", target: "J", value: 10 }
-    ]
+      { source: 'B', target: 'K', value: 10 },
+      { source: 'B', target: 'K', value: 5 },
+      { source: 'B', target: 'F', value: 15 },
+      { source: 'C', target: 'E', value: 5 },
+      { source: 'B', target: 'H', value: 15 },
+      { source: 'B', target: 'L', value: 6 },
+      { source: 'B', target: 'K', value: 15 },
+      { source: 'B', target: 'I', value: 10 },
+      { source: 'C', target: 'H', value: 4 },
+      { source: 'B', target: 'G', value: 15 },
+      { source: 'B', target: 'J', value: 15 },
+      { source: 'D', target: 'J', value: 10 },
+    ],
   };
 
   return (
     <div className="flex flex-col justify-center items-center container mx-auto p-4">
-      <h1 className="text-center text-2xl font-bold mb-8">Data Visualizations</h1>
-      <div className="mb-12 min-w-max min-h-max">
-        <h2 className="text-center text-xl font-semibold mb-4">Chord Graph</h2>
+      <h1 className="text-center text-white text-2xl font-bold mb-8">
+        Data Visualizations
+      </h1>
+      <div className=" justify-center items-center mb-12 min-w-max min-h-max">
+        <h2 className="text-center text-xl text-white font-semibold mb-4">Chord Graph</h2>
         <ChordGraph data={chordData} />
+        <div className='flex justify-center items-center'>
+        <button
+          type="button"
+          className="mt-4 p-4 bg-blue-500 text-white rounded hover:bg-blue-700"
+          onClick={changeData}
+        >
+          Change Data
+        </button>
+        </div>
       </div>
       <div>
-        <h2 className="text-center text-xl font-semibold mb-4">Sankey Diagram</h2>
+        <h2 className="text-center text-xl text-white font-semibold mb-4">
+          Sankey Diagram
+        </h2>
         <SankeyDiagram data={sankeyData} />
       </div>
     </div>

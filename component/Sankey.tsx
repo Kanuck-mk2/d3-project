@@ -2,15 +2,15 @@
 
 import React, { useEffect, useRef } from 'react';
 import * as d3 from 'd3';
-import { sankey as d3Sankey, SankeyLink, SankeyNode } from 'd3-sankey';
+import { sankey as d3Sankey, SankeyLink, SankeyNode, sankeyLinkHorizontal } from 'd3-sankey';
 
 interface Node extends SankeyNode<Node, Link> {
   name: string;
 }
 
 interface Link extends SankeyLink<Node, Link> {
-  source: string;
-  target: string;
+  source: number;
+  target: number;
   value: number;
 }
 
@@ -46,10 +46,19 @@ const SankeyDiagram: React.FC<SankeyDiagramProps> = ({ data }) => {
         [width - 1, height - 5],
       ]);
 
-    const { nodes, links } = sankey({
-      nodes: data.nodes.map((d) => Object.assign({}, d)),
-      links: data.links.map((d) => Object.assign({}, d)),
-    });
+    // Create a map to get the index of nodes by name
+    const nodeMap = new Map(data.nodes.map((d, i) => [d.name, i]));
+
+    const sankeyData = {
+      nodes: data.nodes.map((d) => ({ ...d })),
+      links: data.links.map((d) => ({
+        source: nodeMap.get(d.source) ?? -1, // Convert name to index
+        target: nodeMap.get(d.target) ?? -1, // Convert name to index
+        value: d.value,
+      })),
+    };
+
+    const { nodes, links } = sankey(sankeyData);
 
     svg.selectAll('*').remove();
 
@@ -62,7 +71,7 @@ const SankeyDiagram: React.FC<SankeyDiagramProps> = ({ data }) => {
       .selectAll('path')
       .data(links)
       .join('path')
-      .attr('d', d3.sankeyLinkHorizontal())
+      .attr('d', sankeyLinkHorizontal()) // Use the imported function
       .attr('stroke-width', (d) => Math.max(1, d.width));
 
     // Add the nodes
