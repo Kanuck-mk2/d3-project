@@ -75,11 +75,11 @@ export default function Home() {
   };
 
   return (
-    <div className="flex flex-col justify-center items-center container mx-auto p-4">
+    <div className="flex flex-col justify-center items-center container mx-auto p-1">
       <h1 className="text-center text-white text-2xl font-bold mb-8">
         Data Visualizations
       </h1>
-      <div className=" justify-center items-center mb-12 min-w-max min-h-max">
+      <div className=" justify-center items-center mb-12">
         <h2 className="text-center text-xl text-white font-semibold mb-4">
           Chord Graph
         </h2>

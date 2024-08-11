@@ -14,8 +14,8 @@ const ChordGraph: React.FC<ChordGraphProps> = ({ data }) => {
   useEffect(() => {
     if (!svgRef.current || !tooltipRef.current) return;
 
-    const width = 800;
-    const height = 800;
+    const width = 1500;
+    const height = 1500;
     const innerRadius = Math.min(width, height) * 0.5 - 90;
     const outerRadius = innerRadius + 10;
 
