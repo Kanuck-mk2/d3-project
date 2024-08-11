@@ -1,23 +1,29 @@
+'use client';
+
 import React, { useEffect, useRef } from 'react';
 import * as d3 from 'd3';
-import { sankey as d3Sankey, sankeyLinkHorizontal, SankeyLink, SankeyNode } from 'd3-sankey';
+import { sankey as d3Sankey, SankeyLink, SankeyNode } from 'd3-sankey';
 
-interface Node extends SankeyNode<{}, {}> {
+interface Node extends SankeyNode<Node, Link> {
   name: string;
 }
 
-interface Link extends SankeyLink<Node, {}> {
-  source: number;
-  target: number;
+interface Link extends SankeyLink<Node, Link> {
+  source: string;
+  target: string;
   value: number;
 }
 
 interface SankeyData {
-  nodes: Node[];
-  links: Link[];
+  nodes: { name: string }[];
+  links: { source: string; target: string; value: number }[];
 }
 
-const SankeyDiagram: React.FC<{ data: SankeyData }> = ({ data }) => {
+interface SankeyDiagramProps {
+  data: SankeyData;
+}
+
+const SankeyDiagram: React.FC<SankeyDiagramProps> = ({ data }) => {
   const svgRef = useRef<SVGSVGElement | null>(null);
 
   useEffect(() => {
@@ -26,57 +32,64 @@ const SankeyDiagram: React.FC<{ data: SankeyData }> = ({ data }) => {
     const width = 700;
     const height = 300;
 
-    const svg = d3.select(svgRef.current)
+    const svg = d3
+      .select(svgRef.current)
       .attr('viewBox', `0 0 ${width} ${height}`)
       .attr('width', '100%')
       .attr('height', '100%');
 
     const sankey = d3Sankey<Node, Link>()
-      .nodeWidth(36)
+      .nodeWidth(15)
       .nodePadding(10)
-      .extent([[1, 1], [width - 1, height - 5]]);
+      .extent([
+        [1, 1],
+        [width - 1, height - 5],
+      ]);
 
-    const { nodes, links } = sankey(data);
+    const { nodes, links } = sankey({
+      nodes: data.nodes.map((d) => Object.assign({}, d)),
+      links: data.links.map((d) => Object.assign({}, d)),
+    });
 
     svg.selectAll('*').remove();
 
     // Add the links
-    svg.append('g')
+    svg
+      .append('g')
+      .attr('fill', 'none')
+      .attr('stroke', '#000')
+      .attr('stroke-opacity', 0.2)
       .selectAll('path')
       .data(links)
-      .enter().append('path')
-      .attr('class', 'link')
-      .attr('d', sankeyLinkHorizontal())
-      .style('stroke-width', d => Math.max(1, d.width))
-      .style('stroke', d => d.index % 2 === 0 ? 'url(#gradient1)' : 'url(#gradient2)') // Apply gradients
-      .style('fill', 'none');
+      .join('path')
+      .attr('d', d3.sankeyLinkHorizontal())
+      .attr('stroke-width', (d) => Math.max(1, d.width));
 
     // Add the nodes
-    const node = svg.append('g')
-      .selectAll('.node')
+    svg
+      .append('g')
+      .selectAll('rect')
       .data(nodes)
-      .enter().append('g')
-      .attr('class', 'node')
-      .attr('transform', d => `translate(${d.x0},${d.y0})`);
+      .join('rect')
+      .attr('x', (d) => d.x0!)
+      .attr('y', (d) => d.y0!)
+      .attr('height', (d) => d.y1! - d.y0!)
+      .attr('width', (d) => d.x1! - d.x0!)
+      .attr('fill', (d) => d3.schemeCategory10[d.index % 10]);
 
-    node.append('rect')
-      .attr('height', d => d.y1 - d.y0)
-      .attr('width', sankey.nodeWidth())
-      .style('fill', d => d3.scaleOrdinal(d3.schemeCategory10)(d.name) as string)
-      .style('stroke', d => d3.rgb(d3.scaleOrdinal(d3.schemeCategory10)(d.name) as string).darker(2).toString())
-      .append('title')
-      .text(d => `${d.name}\n${d.value}`);
-
-    node.append('text')
-      .attr('x', -6)
-      .attr('y', d => (d.y1 - d.y0) / 2)
+    // Add the labels
+    svg
+      .append('g')
+      .attr('font-family', 'sans-serif')
+      .attr('font-size', 10)
+      .selectAll('text')
+      .data(nodes)
+      .join('text')
+      .attr('x', (d) => (d.x0! < width / 2 ? d.x1! + 6 : d.x0! - 6))
+      .attr('y', (d) => (d.y1! + d.y0!) / 2)
       .attr('dy', '0.35em')
-      .attr('text-anchor', 'end')
-      .text(d => d.name)
-      .filter(d => d.x0 < width / 2)
-      .attr('x', 6 + sankey.nodeWidth())
-      .attr('text-anchor', 'start');
-
+      .attr('text-anchor', (d) => (d.x0! < width / 2 ? 'start' : 'end'))
+      .text((d) => d.name);
   }, [data]);
 
   return <svg ref={svgRef}></svg>;
