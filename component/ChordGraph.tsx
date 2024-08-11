@@ -19,7 +19,6 @@ const ChordGraph: React.FC<ChordGraphProps> = ({ data }) => {
     const innerRadius = Math.min(width, height) * 0.5 - 90;
     const outerRadius = innerRadius + 10;
 
-    // Generate the chord layout
     const chord = d3.chord()
       .padAngle(0.05)
       .sortSubgroups(d3.descending)(data);
@@ -38,49 +37,66 @@ const ChordGraph: React.FC<ChordGraphProps> = ({ data }) => {
       .attr('viewBox', [-width / 2, -height / 2, width, height].join(' '))
       .attr('style', 'width: 100%; height: auto; font: 15px sans-serif;');
 
-    // Remove old elements before rendering new ones
+    // Remove old elements
     svg.selectAll('*').remove();
+
+    // Define gradients
+    const defs = svg.append('defs');
+    const gradient1 = defs.append('linearGradient')
+      .attr('id', 'gradient1')
+      .attr('x1', '0%').attr('y1', '0%')
+      .attr('x2', '100%').attr('y2', '100%');
+    gradient1.append('stop').attr('offset', '0%').attr('stop-color', '#1f77b4');
+    gradient1.append('stop').attr('offset', '100%').attr('stop-color', '#aec7e8');
+
+    const gradient2 = defs.append('linearGradient')
+      .attr('id', 'gradient2')
+      .attr('x1', '0%').attr('y1', '0%')
+      .attr('x2', '100%').attr('y2', '100%');
+    gradient2.append('stop').attr('offset', '0%').attr('stop-color', '#ff7f0e');
+    gradient2.append('stop').attr('offset', '100%').attr('stop-color', '#ffbb78');
 
     // Create groups for arcs
     const groups = svg.append('g')
       .selectAll('g')
       .data(chord.groups)
       .join(
-        (enter) =>
-          enter.append('g')
-            .append('path')
-            .attr('fill', (d, i) => i % 2 === 0 ? 'url(#gradient1)' : 'url(#gradient2)')
-            .attr('stroke', d => d3.rgb(color(d.index)).darker().toString())
-            .attr('d', arc as any)
-            .attr('opacity', 0) // Start with opacity 0 for fade-in effect
-            .call(enter => enter.transition().duration(1000).attr('opacity', 1)), // Fade-in effect
-        (update) =>
-          update.select('path')
-            .attr('d', arc as any)
-            .call(update => update.transition().duration(1000)), // Smooth update transition
-        (exit) => exit.remove() // Remove elements that are no longer needed
+        enter => enter.append('g'),
+        update => update,
+        exit => exit.remove()
       );
 
-    // Add ribbons between the arcs
-    svg.append('g')
+    // Add arcs
+    groups.append('path')
+      .attr('fill', (d, i) => i % 2 === 0 ? 'url(#gradient1)' : 'url(#gradient2)')
+      .attr('stroke', d => d3.rgb(color(d.index)).darker().toString())
+      .attr('d', arc as any)
+      .attr('opacity', 0)
+      .transition()
+      .duration(1000)
+      .attr('opacity', 1);
+
+    // Add ribbons
+    const ribbons = svg.append('g')
       .attr('fill-opacity', 0.67)
       .selectAll('path')
       .data(chord)
       .join(
-        (enter) =>
-          enter.append('path')
-            .attr('d', ribbon as any)
-            .attr('fill', d => color(d.target.index))
-            .attr('stroke', d => d3.rgb(color(d.target.index)).darker().toString())
-            .attr('opacity', 0) // Start with opacity 0 for fade-in effect
-            .call(enter => enter.transition().duration(1000).attr('opacity', 1)), // Fade-in effect
-        (update) =>
-          update.attr('d', ribbon as any)
-            .call(update => update.transition().duration(1000)), // Smooth update transition
-        (exit) => exit.remove() // Remove elements that are no longer needed
+        enter => enter.append('path'),
+        update => update,
+        exit => exit.remove()
       );
 
-    // Add labels to the arcs
+    ribbons
+      .attr('d', ribbon as any)
+      .attr('fill', d => color(d.target.index))
+      .attr('stroke', d => d3.rgb(color(d.target.index)).darker().toString())
+      .attr('opacity', 0)
+      .transition()
+      .duration(1000)
+      .attr('opacity', 1);
+
+    // Add labels
     groups.append('text')
       .each(d => (d as any).angle = (d.startAngle + d.endAngle) / 2)
       .attr('dy', '.35em')
@@ -92,17 +108,16 @@ const ChordGraph: React.FC<ChordGraphProps> = ({ data }) => {
       .attr('text-anchor', d => (d as any).angle > Math.PI ? 'end' : null)
       .text(d => `Group ${d.index + 1}`);
 
-    // Tooltip setup
+    // Tooltip
     const tooltip = d3.select(tooltipRef.current)
-    .style('position', 'absolute')
-    .style('visibility', 'hidden')
-    .style('background-color', 'white')
-    .style('border', 'solid')
-    .style('border-width', '1px')
-    .style('border-radius', '5px')
-    .style('padding', '10px');
+      .style('position', 'absolute')
+      .style('visibility', 'hidden')
+      .style('background-color', 'white')
+      .style('border', 'solid')
+      .style('border-width', '1px')
+      .style('border-radius', '5px')
+      .style('padding', '10px');
 
-    // Event listeners for the tooltip
     svg.selectAll('path')
       .on('mouseover', function(event, d) {
         d3.select(this).attr('stroke-width', 2);
@@ -124,7 +139,7 @@ const ChordGraph: React.FC<ChordGraphProps> = ({ data }) => {
         tooltip.style('visibility', 'hidden');
       });
 
-  }, [data]); // Re-render and animate when `data` changes
+  }, [data]);
 
   return (
     <div className="relative">
