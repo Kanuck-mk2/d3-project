@@ -22,24 +22,26 @@ interface SankeyData {
 
 export default function Home() {
   // Initialize state with the first dataset for the Chord graph
-  const [chordData, setChordData] = useState<ChordData>([
+  const originalData: ChordData = [
     [11975, 5871, 8916, 2868],
     [1951, 10048, 2060, 6171],
     [8010, 16145, 8090, 8045],
     [1013, 990, 940, 6907],
-  ]);
+  ];
 
-  // Second dataset for the Chord graph
-  const secondChordData: ChordData = [
+  const secondData: ChordData = [
     [5000, 2000, 3000, 4000],
     [6000, 7000, 2030, 3000],
     [3000, 4700, 7000, 5000],
     [2000, 3040, 5000, 1000],
   ];
 
-  // Function to change the dataset for the Chord graph
+  const [chordData, setChordData] = useState<ChordData>(originalData);
+  const [toggle, setToggle] = useState(false);
+
   const changeData = () => {
-    setChordData(secondChordData);
+    setChordData(toggle ? originalData : secondData);
+    setToggle(!toggle);
   };
 
   // Sankey data definition

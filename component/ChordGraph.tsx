@@ -9,13 +9,12 @@ interface ChordGraphProps {
 
 const ChordGraph: React.FC<ChordGraphProps> = ({ data }) => {
   const svgRef = useRef<SVGSVGElement | null>(null);
-  const tooltipRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
-    if (!svgRef.current || !tooltipRef.current) return;
+    if (!svgRef.current) return;
 
-    const width = 1500;
-    const height = 1500;
+    const width = 900;
+    const height = 900;
     const innerRadius = Math.min(width, height) * 0.5 - 90;
     const outerRadius = innerRadius + 10;
 
@@ -40,61 +39,44 @@ const ChordGraph: React.FC<ChordGraphProps> = ({ data }) => {
     // Remove old elements
     svg.selectAll('*').remove();
 
-    // Define gradients
-    const defs = svg.append('defs');
-    const gradient1 = defs.append('linearGradient')
-      .attr('id', 'gradient1')
-      .attr('x1', '0%').attr('y1', '0%')
-      .attr('x2', '100%').attr('y2', '100%');
-    gradient1.append('stop').attr('offset', '0%').attr('stop-color', '#1f77b4');
-    gradient1.append('stop').attr('offset', '100%').attr('stop-color', '#aec7e8');
-
-    const gradient2 = defs.append('linearGradient')
-      .attr('id', 'gradient2')
-      .attr('x1', '0%').attr('y1', '0%')
-      .attr('x2', '100%').attr('y2', '100%');
-    gradient2.append('stop').attr('offset', '0%').attr('stop-color', '#ff7f0e');
-    gradient2.append('stop').attr('offset', '100%').attr('stop-color', '#ffbb78');
-
     // Create groups for arcs
     const groups = svg.append('g')
       .selectAll('g')
       .data(chord.groups)
       .join(
-        enter => enter.append('g'),
-        update => update,
-        exit => exit.remove()
+        (enter) =>
+          enter.append('g')
+            .append('path')
+            .attr('fill', (d, i) => color(d.index))
+            .attr('stroke', d => d3.rgb(color(d.index)).darker().toString())
+            .attr('d', arc as any)
+            .attr('opacity', 0)
+            .call(enter => enter.transition().duration(1000).attr('opacity', 1)),
+        (update) =>
+          update.select('path')
+            .attr('d', arc as any)
+            .call(update => update.transition().duration(1000)),
+        (exit) => exit.remove()
       );
 
-    // Add arcs
-    groups.append('path')
-      .attr('fill', (d, i) => i % 2 === 0 ? 'url(#gradient1)' : 'url(#gradient2)')
-      .attr('stroke', d => d3.rgb(color(d.index)).darker().toString())
-      .attr('d', arc as any)
-      .attr('opacity', 0)
-      .transition()
-      .duration(1000)
-      .attr('opacity', 1);
-
-    // Add ribbons
-    const ribbons = svg.append('g')
+    // Add ribbons with transition
+    svg.append('g')
       .attr('fill-opacity', 0.67)
       .selectAll('path')
       .data(chord)
       .join(
-        enter => enter.append('path'),
-        update => update,
-        exit => exit.remove()
+        (enter) =>
+          enter.append('path')
+            .attr('d', ribbon as any)
+            .attr('fill', d => color(d.target.index))
+            .attr('stroke', d => d3.rgb(color(d.target.index)).darker().toString())
+            .attr('opacity', 0)
+            .call(enter => enter.transition().duration(1000).attr('opacity', 1)),
+        (update) =>
+          update.attr('d', ribbon as any)
+            .call(update => update.transition().duration(1000)),
+        (exit) => exit.remove()
       );
-
-    ribbons
-      .attr('d', ribbon as any)
-      .attr('fill', d => color(d.target.index))
-      .attr('stroke', d => d3.rgb(color(d.target.index)).darker().toString())
-      .attr('opacity', 0)
-      .transition()
-      .duration(1000)
-      .attr('opacity', 1);
 
     // Add labels
     groups.append('text')
@@ -108,44 +90,10 @@ const ChordGraph: React.FC<ChordGraphProps> = ({ data }) => {
       .attr('text-anchor', d => (d as any).angle > Math.PI ? 'end' : null)
       .text(d => `Group ${d.index + 1}`);
 
-    // Tooltip
-    const tooltip = d3.select(tooltipRef.current)
-      .style('position', 'absolute')
-      .style('visibility', 'hidden')
-      .style('background-color', 'white')
-      .style('border', 'solid')
-      .style('border-width', '1px')
-      .style('border-radius', '5px')
-      .style('padding', '10px');
-
-    svg.selectAll('path')
-      .on('mouseover', function(event, d) {
-        d3.select(this).attr('stroke-width', 2);
-        tooltip.style('visibility', 'visible');
-        
-        // Check if `d` is a ribbon
-        const isRibbon = (d as any).source && (d as any).target;
-        const value = isRibbon ? (d as any).source.value : (d as any).value;
-        
-        tooltip.text(`Value: ${value}`);
-      })
-      .on('mousemove', function(event) {
-        tooltip
-          .style('top', `${event.pageY - 20}px`)
-          .style('left', `${event.pageX + 20}px`);
-      })
-      .on('mouseout', function() {
-        d3.select(this).attr('stroke-width', null);
-        tooltip.style('visibility', 'hidden');
-      });
-
   }, [data]);
 
   return (
-    <div className="relative">
-      <svg ref={svgRef}></svg>
-      <div ref={tooltipRef} className="absolute bg-white text-black p-2 rounded border" style={{ visibility: 'hidden' }}></div>
-    </div>
+    <svg ref={svgRef}></svg>
   );
 };
 
