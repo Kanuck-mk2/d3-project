@@ -13,8 +13,8 @@ const ChordGraph: React.FC<ChordGraphProps> = ({ data }) => {
   useEffect(() => {
     if (!svgRef.current) return;
 
-    const width = 900;
-    const height = 900;
+    const width = 1200;
+    const height = 1200;
     const innerRadius = Math.min(width, height) * 0.5 - 90;
     const outerRadius = innerRadius + 10;
 

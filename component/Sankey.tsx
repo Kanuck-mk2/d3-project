@@ -29,8 +29,8 @@ const SankeyDiagram: React.FC<SankeyDiagramProps> = ({ data }) => {
   useEffect(() => {
     if (!svgRef.current) return;
 
-    const width = 700;
-    const height = 300;
+    const width = 2000;
+    const height = 2000;
 
     const svg = d3
       .select(svgRef.current)
