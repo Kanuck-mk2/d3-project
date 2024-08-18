@@ -62,29 +62,43 @@ const SankeyDiagram: React.FC<SankeyDiagramProps> = ({ data }) => {
 
     svg.selectAll('*').remove();
 
-    // Add the links
-    svg
+    // Add the links with animation
+    const linkSelection = svg
       .append('g')
       .attr('fill', 'none')
       .attr('stroke', '#000')
       .attr('stroke-opacity', 0.2)
       .selectAll('path')
       .data(links)
-      .join('path')
-      .attr('d', sankeyLinkHorizontal()) // Use the imported function
-      .attr('stroke-width', (d) => Math.max(1, d.width));
+      .join(
+        (enter) => enter
+          .append('path')
+          .attr('d', sankeyLinkHorizontal())
+          .attr('stroke-width', (d) => Math.max(1, d.width))
+          .attr('opacity', 0)
+          .call(enter => enter.transition().duration(1000).attr('opacity', 1)),
+        (update) => update,
+        (exit) => exit.transition().duration(1000).attr('opacity', 0).remove()
+      );
 
-    // Add the nodes
-    svg
+    // Add the nodes with animation
+    const nodeSelection = svg
       .append('g')
       .selectAll('rect')
       .data(nodes)
-      .join('rect')
-      .attr('x', (d) => d.x0!)
-      .attr('y', (d) => d.y0!)
-      .attr('height', (d) => d.y1! - d.y0!)
-      .attr('width', (d) => d.x1! - d.x0!)
-      .attr('fill', (d) => d3.schemeCategory10[d.index % 10]);
+      .join(
+        (enter) => enter
+          .append('rect')
+          .attr('x', (d) => d.x0!)
+          .attr('y', (d) => d.y0!)
+          .attr('height', (d) => d.y1! - d.y0!)
+          .attr('width', (d) => d.x1! - d.x0!)
+          .attr('fill', (d) => d3.schemeCategory10[d.index % 10])
+          .attr('opacity', 0)
+          .call(enter => enter.transition().duration(1000).attr('opacity', 1)),
+        (update) => update,
+        (exit) => exit.transition().duration(1000).attr('opacity', 0).remove()
+      );
 
     // Add the labels
     svg
@@ -99,6 +113,7 @@ const SankeyDiagram: React.FC<SankeyDiagramProps> = ({ data }) => {
       .attr('dy', '0.35em')
       .attr('text-anchor', (d) => (d.x0! < width / 2 ? 'start' : 'end'))
       .text((d) => d.name);
+
   }, [data]);
 
   return <svg ref={svgRef}></svg>;
