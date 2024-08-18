@@ -39,7 +39,7 @@ const SankeyDiagram: React.FC<SankeyDiagramProps> = ({ data }) => {
       .attr('height', '100%');
 
     const sankey = d3Sankey<Node, Link>()
-      .nodeWidth(15)
+      .nodeWidth(20)
       .nodePadding(10)
       .extent([
         [1, 1],

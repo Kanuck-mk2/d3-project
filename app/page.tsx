@@ -47,8 +47,8 @@ export default function Home() {
   // Sankey data definition
   const sankeyData: SankeyData = {
     nodes: [
-      { name: 'A' },
-      { name: 'B' },
+      { name: 'Solar' },
+      { name: 'Nuclear' },
       { name: 'C' },
       { name: 'D' },
       { name: 'E' },
