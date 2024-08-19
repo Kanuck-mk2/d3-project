@@ -74,7 +74,7 @@ const ChordGraph: React.FC<ChordGraphProps> = ({ data }) => {
             .call(enter => enter.transition().duration(1000).attr('opacity', 1)),
         (update) =>
           update.attr('d', ribbon as any)
-            .call(update => update.transition().duration(1000)),
+            .call(update => update.transition().duration(2000)),
         (exit) => exit.remove()
       );
 
@@ -93,6 +93,7 @@ const ChordGraph: React.FC<ChordGraphProps> = ({ data }) => {
   }, [data]);
 
   return (
+    <div className='tooltip' style={{ display: 'none', position: 'absolute', backgroundColor: 'black', color: 'white', padding: '5px', borderRadius: '3px', pointerEvents: 'none'  }}></div>
     <svg ref={svgRef}></svg>
   );
 };

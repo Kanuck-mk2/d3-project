@@ -38,9 +38,11 @@ const SankeyDiagram: React.FC<SankeyDiagramProps> = ({ data }) => {
       .attr('width', '100%')
       .attr('height', '100%');
 
+      const tooltip = d3.select('.tooltip')
+
     const sankey = d3Sankey<Node, Link>()
       .nodeWidth(20)
-      .nodePadding(10)
+      .nodePadding(50)
       .extent([
         [1, 1],
         [width - 1, height - 5],
@@ -104,14 +106,14 @@ const SankeyDiagram: React.FC<SankeyDiagramProps> = ({ data }) => {
     svg
       .append('g')
       .attr('font-family', 'sans-serif')
-      .attr('font-size', 10)
+      .attr('font-size', 30)
       .selectAll('text')
       .data(nodes)
       .join('text')
-      .attr('x', (d) => (d.x0! < width / 2 ? d.x1! + 6 : d.x0! - 6))
+      .attr('x', (d) => (d.x0! < width / 5 ? d.x1! + 2 : d.x0! - 6))
       .attr('y', (d) => (d.y1! + d.y0!) / 2)
-      .attr('dy', '0.35em')
-      .attr('text-anchor', (d) => (d.x0! < width / 2 ? 'start' : 'end'))
+      .attr('dy', '0.65em')
+      .attr('text-anchor', (d) => (d.x0! < width / 7 ? 'start' : 'end'))
       .text((d) => d.name);
 
   }, [data]);

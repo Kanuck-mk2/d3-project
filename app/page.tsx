@@ -61,20 +61,16 @@ export default function Home() {
       { name: 'L' },
     ],
     links: [
-      { source: 'B', target: 'K', value: 10 },
-      { source: 'B', target: 'K', value: 5 },
-      { source: 'B', target: 'F', value: 15 },
-      { source: 'C', target: 'E', value: 5 },
-      { source: 'B', target: 'H', value: 15 },
-      { source: 'B', target: 'L', value: 6 },
-      { source: 'B', target: 'K', value: 15 },
-      { source: 'B', target: 'I', value: 10 },
-      { source: 'C', target: 'H', value: 4 },
-      { source: 'B', target: 'G', value: 15 },
-      { source: 'B', target: 'J', value: 15 },
-      { source: 'D', target: 'J', value: 10 },
+      { source: 'Nuclear', target: 'K', value: 10 },
+      { source: 'Nuclear', target: 'K', value: 5 },
+      { source: 'Nuclear', target: 'Oil', value: 15 },
+      { source: 'Solar', target: 'L', value: 10 },
+      { source: 'Tidal', target: 'I', value: 5 },
+      { source: 'Nuclear', target: 'Geothermal', value: 15 },
+      
     ],
   };
+  
 
   return (
     <div className="flex flex-col justify-center items-center container mx-auto p-1">
