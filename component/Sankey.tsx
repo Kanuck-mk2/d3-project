@@ -38,7 +38,17 @@ const SankeyDiagram: React.FC<SankeyDiagramProps> = ({ data }) => {
       .attr('width', '100%')
       .attr('height', '100%');
 
-      const tooltip = d3.select('.tooltip')
+    // Add a div for the tooltip
+    const tooltip = d3.select('body').append('div')
+      .attr('class', 'tooltip')
+      .style('position', 'absolute')
+      .style('background-color', 'black')
+      .style('color', 'white')
+      .style('padding', '5px')
+      .style('border-radius', '3px')
+      .style('pointer-events', 'none')
+      .style('font-size', '12px')
+      .style('display', 'none');
 
     const sankey = d3Sankey<Node, Link>()
       .nodeWidth(20)
@@ -73,31 +83,44 @@ const SankeyDiagram: React.FC<SankeyDiagramProps> = ({ data }) => {
       .selectAll('path')
       .data(links)
       .join(
-        (enter) => enter
-          .append('path')
-          .attr('d', sankeyLinkHorizontal())
-          .attr('stroke-width', (d) => Math.max(1, d.width))
-          .attr('opacity', 0)
-          .call(enter => enter.transition().duration(1000).attr('opacity', 1)),
+        (enter) =>
+          enter
+            .append('path')
+            .attr('d', sankeyLinkHorizontal())
+            .attr('stroke-width', (d) => Math.max(1, d.width))
+            .attr('opacity', 0)
+            .call((enter) => enter.transition().duration(1000).attr('opacity', 1)),
         (update) => update,
         (exit) => exit.transition().duration(1000).attr('opacity', 0).remove()
       );
 
-    // Add the nodes with animation
+    // Add the nodes with animation and tooltip events
     const nodeSelection = svg
       .append('g')
       .selectAll('rect')
       .data(nodes)
       .join(
-        (enter) => enter
-          .append('rect')
-          .attr('x', (d) => d.x0!)
-          .attr('y', (d) => d.y0!)
-          .attr('height', (d) => d.y1! - d.y0!)
-          .attr('width', (d) => d.x1! - d.x0!)
-          .attr('fill', (d) => d3.schemeCategory10[d.index % 10])
-          .attr('opacity', 0)
-          .call(enter => enter.transition().duration(1000).attr('opacity', 1)),
+        (enter) =>
+          enter
+            .append('rect')
+            .attr('x', (d) => d.x0!)
+            .attr('y', (d) => d.y0!)
+            .attr('height', (d) => d.y1! - d.y0!)
+            .attr('width', (d) => d.x1! - d.x0!)
+            .attr('fill', (d) => d3.schemeCategory10[d.index % 10])
+            .attr('opacity', 0)
+            .on('mouseover', (event, d) => {
+              tooltip.style('display', 'block').html(`Node: ${d.name}`);
+            })
+            .on('mousemove', (event) => {
+              tooltip
+                .style('left', `${event.pageX + 5}px`)
+                .style('top', `${event.pageY + 5}px`);
+            })
+            .on('mouseout', () => {
+              tooltip.style('display', 'none');
+            })
+            .call((enter) => enter.transition().duration(1000).attr('opacity', 1)),
         (update) => update,
         (exit) => exit.transition().duration(1000).attr('opacity', 0).remove()
       );
@@ -116,6 +139,10 @@ const SankeyDiagram: React.FC<SankeyDiagramProps> = ({ data }) => {
       .attr('text-anchor', (d) => (d.x0! < width / 7 ? 'start' : 'end'))
       .text((d) => d.name);
 
+    // Cleanup the tooltip on component unmount
+    return () => {
+      tooltip.remove();
+    };
   }, [data]);
 
   return <svg ref={svgRef}></svg>;
