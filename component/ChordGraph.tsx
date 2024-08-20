@@ -93,7 +93,7 @@ const ChordGraph: React.FC<ChordGraphProps> = ({ data }) => {
   }, [data]);
 
   return (
-    <div className='tooltip' style={{ display: 'none', position: 'absolute', backgroundColor: 'black', color: 'white', padding: '5px', borderRadius: '3px', pointerEvents: 'none'  }}></div>
+    
     <svg ref={svgRef}></svg>
   );
 };
