@@ -81,7 +81,9 @@ export default function Home() {
         <h2 className="text-center text-xl text-white font-semibold mb-4">
           Chord Graph
         </h2>
+        <div className='w-[500px] h-[500px]'>
         <ChordGraph data={chordData} />
+        </div>
         <div className="flex justify-center items-center">
           <button
             type="button"

@@ -9,7 +9,7 @@ const config: Config = {
   theme: {
     extend: {
       backgroundImage: {
-        'gradient-bg': 'radial-gradient(circle, hsl(272, 86%, 48%), hsl(40, 60%, 64%))',
+        'gradient-bg': 'radial-gradient(circle, hsl(272, 86%, 48%), hsl(311, 30%, 74%))',
       },
       
       
