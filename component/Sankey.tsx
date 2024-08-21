@@ -38,17 +38,7 @@ const SankeyDiagram: React.FC<SankeyDiagramProps> = ({ data }) => {
       .attr('width', '100%')
       .attr('height', '100%');
 
-    // Add a div for the tooltip
-    const tooltip = d3.select('body').append('div')
-      .attr('class', 'tooltip')
-      .style('position', 'absolute')
-      .style('background-color', 'black')
-      .style('color', 'white')
-      .style('padding', '5px')
-      .style('border-radius', '3px')
-      .style('pointer-events', 'none')
-      .style('font-size', '12px')
-      .style('display', 'none');
+    const tooltip = d3.select('.tooltip');
 
     const sankey = d3Sankey<Node, Link>()
       .nodeWidth(20)
@@ -58,14 +48,13 @@ const SankeyDiagram: React.FC<SankeyDiagramProps> = ({ data }) => {
         [width - 1, height - 5],
       ]);
 
-    // Create a map to get the index of nodes by name
     const nodeMap = new Map(data.nodes.map((d, i) => [d.name, i]));
 
     const sankeyData = {
       nodes: data.nodes.map((d) => ({ ...d })),
       links: data.links.map((d) => ({
-        source: nodeMap.get(d.source) ?? -1, // Convert name to index
-        target: nodeMap.get(d.target) ?? -1, // Convert name to index
+        source: nodeMap.get(d.source) ?? -1,
+        target: nodeMap.get(d.target) ?? -1,
         value: d.value,
       })),
     };
@@ -74,75 +63,95 @@ const SankeyDiagram: React.FC<SankeyDiagramProps> = ({ data }) => {
 
     svg.selectAll('*').remove();
 
-    // Add the links with animation
+    // Define gradients
+    const gradientDefs = svg.append('defs');
+    gradientDefs
+      .selectAll('linearGradient')
+      .data(links)
+      .enter()
+      .append('linearGradient')
+      .attr('id', (d, i) => `link-gradient-${i}`)
+      .attr('x1', '0%')
+      .attr('x2', '50%')
+      .attr('y1', '0%')
+      .attr('y2', '100%')
+      .append('stop')
+      .attr('offset', '0%')
+      .attr('stop-color', (d) => d3.interpolateRainbow(d.value / d3.max(links, (l) => l.value)!))
+      .append('stop')
+      .attr('offset', '100%')
+      .attr('stop-color', (d) => d3.interpolateRainbow(d.value / d3.max(links, (l) => l.value)!));
+
+    // Add the links with gradient colors
     const linkSelection = svg
       .append('g')
       .attr('fill', 'none')
-      .attr('stroke', '#000')
-      .attr('stroke-opacity', 0.2)
+      .attr('stroke-opacity', 0.6)
       .selectAll('path')
       .data(links)
       .join(
-        (enter) =>
-          enter
-            .append('path')
-            .attr('d', sankeyLinkHorizontal())
-            .attr('stroke-width', (d) => Math.max(1, d.width))
-            .attr('opacity', 0)
-            .call((enter) => enter.transition().duration(1000).attr('opacity', 1)),
-        (update) => update,
+        (enter) => enter
+          .append('path')
+          .attr('d', sankeyLinkHorizontal())
+          .attr('stroke-width', (d) => Math.max(1, d.width))
+          .attr('stroke', (d, i) => `url(#link-gradient-${i}`) // Apply the gradient
+          .attr('opacity', 0)
+          .call((enter) => enter.transition().duration(1000).attr('opacity', 1)),
+        (update) => update
+          .transition().duration(1000)
+          .attr('d', sankeyLinkHorizontal())
+          .attr('stroke-width', (d) => Math.max(1, d.width)),
         (exit) => exit.transition().duration(1000).attr('opacity', 0).remove()
       );
 
-    // Add the nodes with animation and tooltip events
+    // Add the nodes with animation
     const nodeSelection = svg
       .append('g')
       .selectAll('rect')
       .data(nodes)
       .join(
-        (enter) =>
-          enter
-            .append('rect')
-            .attr('x', (d) => d.x0!)
-            .attr('y', (d) => d.y0!)
-            .attr('height', (d) => d.y1! - d.y0!)
-            .attr('width', (d) => d.x1! - d.x0!)
-            .attr('fill', (d) => d3.schemeCategory10[d.index % 10])
-            .attr('opacity', 0)
-            .on('mouseover', (event, d) => {
-              tooltip.style('display', 'block').html(`Node: ${d.name}`);
-            })
-            .on('mousemove', (event) => {
-              tooltip
-                .style('left', `${event.pageX + 5}px`)
-                .style('top', `${event.pageY + 5}px`);
-            })
-            .on('mouseout', () => {
-              tooltip.style('display', 'none');
-            })
-            .call((enter) => enter.transition().duration(1000).attr('opacity', 1)),
-        (update) => update,
+        (enter) => enter
+          .append('rect')
+          .attr('x', (d) => d.x0!)
+          .attr('y', (d) => d.y0!)
+          .attr('height', (d) => d.y1! - d.y0!)
+          .attr('width', (d) => d.x1! - d.x0!)
+          .attr('fill', (d) => d3.schemeCategory10[d.index % 10])
+          .attr('opacity', 0)
+          .call((enter) => enter.transition().duration(1000).attr('opacity', 1)),
+        (update) => update
+          .transition().duration(1000)
+          .attr('x', (d) => d.x0!)
+          .attr('y', (d) => d.y0!)
+          .attr('height', (d) => d.y1! - d.y0!)
+          .attr('width', (d) => d.x1! - d.x0!),
         (exit) => exit.transition().duration(1000).attr('opacity', 0).remove()
       );
 
-    // Add the labels
+    // Add the labels with animation
     svg
       .append('g')
       .attr('font-family', 'sans-serif')
       .attr('font-size', 30)
       .selectAll('text')
       .data(nodes)
-      .join('text')
-      .attr('x', (d) => (d.x0! < width / 5 ? d.x1! + 2 : d.x0! - 6))
-      .attr('y', (d) => (d.y1! + d.y0!) / 2)
-      .attr('dy', '0.65em')
-      .attr('text-anchor', (d) => (d.x0! < width / 7 ? 'start' : 'end'))
-      .text((d) => d.name);
+      .join(
+        (enter) => enter
+          .append('text')
+          .attr('x', (d) => (d.x0! < width / 5 ? d.x1! + 2 : d.x0! - 6))
+          .attr('y', (d) => (d.y1! + d.y0!) / 2)
+          .attr('dy', '0.65em')
+          .attr('text-anchor', (d) => (d.x0! < width / 7 ? 'start' : 'end'))
+          .text((d) => d.name)
+          .attr('opacity', 0)
+          .call((enter) => enter.transition().duration(1000).attr('opacity', 1)),
+        (update) => update
+          .transition().duration(1000)
+          .attr('x', (d) => (d.x0! < width / 5 ? d.x1! + 2 : d.x0! - 6))
+          .attr('y', (d) => (d.y1! + d.y0!) / 2),
+        (exit) => exit.transition().duration(1000).attr('opacity', 0).remove()
+      );
 
-    // Cleanup the tooltip on component unmount
-    return () => {
-      tooltip.remove();
-    };
   }, [data]);
 
   return <svg ref={svgRef}></svg>;

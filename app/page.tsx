@@ -61,12 +61,12 @@ export default function Home() {
       { name: 'L' },
     ],
     links: [
-      { source: 'Nuclear', target: 'K', value: 10 },
+      { source: 'Nuclear', target: 'L', value: 10 },
       { source: 'Nuclear', target: 'K', value: 5 },
-      { source: 'Nuclear', target: 'Oil', value: 15 },
-      { source: 'Solar', target: 'L', value: 10 },
-      { source: 'Tidal', target: 'I', value: 5 },
-      { source: 'Nuclear', target: 'Geothermal', value: 15 },
+      { source: 'Wind', target: 'Oil', value: 15 },
+      { source: 'Wind', target: 'Geothermal', value: 5 },
+      { source: 'Nuclear', target: 'L', value: 15 },
+      { source: 'Solar', target: 'Geothermal', value: 15 },
       
     ],
   };
@@ -92,8 +92,8 @@ export default function Home() {
           </button>
         </div>
       </div>
-      <div>
-        <h2 className="text-center text-xl text-white font-semibold mb-4">
+      <div className=' flex flex-col justify-center items-center lg:flex sm:flex-auto w-[900px] h-[900px] '>
+        <h2 className="text-center text-xl text-sky-400 font-semibold mb-4">
           Sankey Diagram
         </h2>
         <SankeyDiagram data={sankeyData} />

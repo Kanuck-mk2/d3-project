@@ -4,7 +4,7 @@
 
 /* Set background color for the body, instead of using universal selector */
 body {
-  background: hsl(270, 50%, 20%);
+  @apply bg-gradient-bg;
 }
 
 /* Tooltip styling */
