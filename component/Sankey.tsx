@@ -80,7 +80,7 @@ const SankeyDiagram: React.FC<SankeyDiagramProps> = ({ data }) => {
       .attr('stop-color', (d) => d3.interpolatePurples(d.value / d3.max(links, (l) => l.value)!))
       .append('stop')
       .attr('offset', '100%')
-      .attr('stop-color', (d) => d3.interpolateRainbow(d.value / d3.max(links, (l) => l.value)!));
+      .attr('stop-color', (d) => d3.interpolatePurples(d.value / d3.max(links, (l) => l.value)!));
 
     // Add the links with gradient colors
     const linkSelection = svg
