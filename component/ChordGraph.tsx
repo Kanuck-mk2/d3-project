@@ -36,40 +36,50 @@ const ChordGraph: React.FC<ChordGraphProps> = ({ data }) => {
       .attr('viewBox', [-width / 2, -height / 2, width, height].join(' '))
       .attr('style', 'width: 100%; height: auto; font: 15px sans-serif;');
 
-    // JOIN new data with old elements (groups and ribbons)
-    const groupSelection = svg
-      .selectAll('.group')
-      .data(chord.groups, d => (d as d3.ChordGroup).index);
+    // Remove old elements
+    svg.selectAll('*').remove();
 
-    // EXIT old groups
-    groupSelection.exit()
-      .transition()
-      .duration(1000)
-      .attr('opacity', 0)
-      .remove();
+    // Create groups for arcs
+    const groups = svg.append('g')
+      .selectAll('g')
+      .data(chord.groups)
+      .join(
+        (enter) =>
+          enter.append('g')
+            .append('path')
+            .attr('fill', (d, i) => color(d.index))
+            .attr('stroke', d => d3.rgb(color(d.index)).darker().toString())
+            .attr('d', arc as any)
+            .attr('opacity', 0)
+            .call(enter => enter.transition().duration(1000).attr('opacity', 1)),
+        (update) =>
+          update.select('path')
+            .attr('d', arc as any)
+            .call(update => update.transition().duration(1000)),
+        (exit) => exit.remove()
+      );
 
-    // ENTER new groups
-    const groupEnter = groupSelection.enter()
-      .append('g')
-      .attr('class', 'group');
+    // Add ribbons with transition
+    svg.append('g')
+      .attr('fill-opacity', 0.67)
+      .selectAll('path')
+      .data(chord)
+      .join(
+        (enter) =>
+          enter.append('path')
+            .attr('d', ribbon as any)
+            .attr('fill', d => color(d.target.index))
+            .attr('stroke', d => d3.rgb(color(d.target.index)).darker().toString())
+            .attr('opacity', 0)
+            .call(enter => enter.transition().duration(1000).attr('opacity', 1)),
+        (update) =>
+          update.attr('d', ribbon as any)
+            .call(update => update.transition().duration(2000)),
+        (exit) => exit.remove()
+      );
 
-    groupEnter.append('path')
-      .attr('fill', (d, i) => color(d.index))
-      .attr('stroke', d => d3.rgb(color(d.index)).darker().toString())
-      .attr('d', arc as any)
-      .attr('opacity', 0)
-      .transition()
-      .duration(1000)
-      .attr('opacity', 1);
-
-    // UPDATE existing groups
-    groupSelection.select('path')
-      .transition()
-      .duration(1000)
-      .attr('d', arc as any);
-
-    // Add text labels to the groups
-    groupEnter.append('text')
+    // Add labels
+    groups.append('text')
       .each(d => (d as any).angle = (d.startAngle + d.endAngle) / 2)
       .attr('dy', '.35em')
       .attr('transform', d => `
@@ -78,45 +88,14 @@ const ChordGraph: React.FC<ChordGraphProps> = ({ data }) => {
         ${(d as any).angle > Math.PI ? 'rotate(180)' : ''}
       `)
       .attr('text-anchor', d => (d as any).angle > Math.PI ? 'end' : null)
-      .text(d => `Group ${d.index + 1}`)
-      .attr('opacity', 0)
-      .transition()
-      .duration(1000)
-      .attr('opacity', 1);
-
-    // JOIN new data with old elements (ribbons)
-    const ribbonSelection = svg
-      .selectAll('.ribbon')
-      .data(chord, d => `${d.source.index}-${d.target.index}`);
-
-    // EXIT old ribbons
-    ribbonSelection.exit()
-      .transition()
-      .duration(1000)
-      .attr('opacity', 0)
-      .remove();
-
-    // ENTER new ribbons
-    ribbonSelection.enter()
-      .append('path')
-      .attr('class', 'ribbon')
-      .attr('d', ribbon as any)
-      .attr('fill', d => color(d.target.index))
-      .attr('stroke', d => d3.rgb(color(d.target.index)).darker().toString())
-      .attr('opacity', 0)
-      .transition()
-      .duration(1000)
-      .attr('opacity', 1);
-
-    // UPDATE existing ribbons
-    ribbonSelection
-      .transition()
-      .duration(1000)
-      .attr('d', ribbon as any);
+      .text(d => `Group ${d.index + 1}`);
 
   }, [data]);
 
-  return <svg ref={svgRef}></svg>;
+  return (
+    
+    <svg ref={svgRef}></svg>
+  );
 };
 
 export default ChordGraph;
