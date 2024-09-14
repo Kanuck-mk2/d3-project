@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import ChordGraph from '../component/ChordGraph';
 import SankeyDiagram from '../component/Sankey';
+import BarChart from '@/component/BarChart';
 
 type ChordData = number[][];
 
@@ -70,6 +71,8 @@ export default function Home() {
       
     ],
   };
+
+  const [data, setData] = React.useState([30, 80, 45, 60, 20, 90, 50]);
   
 
   return (
@@ -100,6 +103,11 @@ export default function Home() {
         </h2>
         <SankeyDiagram data={sankeyData} />
       </div>
+      <div>
+      <BarChart data={data} />
+      <button type ='button' onClick={changeData}>Change Data</button>
     </div>
+    </div>
+    
   );
 }
